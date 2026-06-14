@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { eq, and, lte } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { words, progress } from "../db/schema.js";
+import { words, progress, reviewLogs } from "../db/schema.js";
 
 // ═══════════════════════════════════════════════════════
 // 艾宾浩斯间隔映射
@@ -149,6 +149,9 @@ export async function submitReview(req: Request, res: Response): Promise<void> {
         updatedAt: now,
       });
     }
+
+    // 记录复习日志（用于统计）
+    await db.insert(reviewLogs).values({ userId, wordId, rating, isCorrect: isCorrect ? 1 : 0 });
 
     res.json({
       message: "Review submitted.",

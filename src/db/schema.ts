@@ -86,6 +86,25 @@ export const refreshTokens = pgTable(
 );
 
 // ═══════════════════════════════════════════════════════
+// review_logs — 复习日志（用于统计图表）
+// ═══════════════════════════════════════════════════════
+export const reviewLogs = pgTable(
+  "review_logs",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    wordId: integer("word_id").notNull().references(() => words.id, { onDelete: "cascade" }),
+    rating: integer("rating").notNull(),          // 0-5
+    isCorrect: integer("is_correct").notNull(),   // 0 or 1
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_rl_user").on(table.userId),
+    index("idx_rl_created").on(table.createdAt),
+  ]
+);
+
+// ═══════════════════════════════════════════════════════
 // progress — 用户学习进度（FSRS / 艾宾浩斯记忆算法）
 // ═══════════════════════════════════════════════════════
 export const progress = pgTable(

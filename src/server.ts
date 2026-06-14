@@ -6,6 +6,7 @@ import { checkDatabaseConnection } from "./db/index.js";
 import authRoutes from "./routes/auth.js";
 import wordRoutes from "./routes/word.js";
 import reviewRoutes from "./routes/review.js";
+import statsRoutes from "./routes/stats.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -52,6 +53,7 @@ app.get("/api/health", async (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/words", wordRoutes);
 app.use("/api/review", reviewRoutes);
+app.use("/api/stats", statsRoutes);
 
 // ═══════════════════════════════════════════════════════
 // 启动服务器

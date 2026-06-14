@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import Flashcard, { type WordData } from "./components/Flashcard";
 import TypingPractice from "./components/TypingPractice";
 import WordsPage from "./components/WordsPage";
+import StatsPage from "./components/StatsPage";
 import { useAuth } from "./context/AuthContext";
 import { useTheme } from "./context/ThemeContext";
 import {
@@ -200,7 +201,7 @@ export default function App() {
 
       {page === "review" && <ReviewPage words={words} index={index} direction={direction} goPrev={goPrev} goNext={goNext} submitReview={submitReview} refreshWords={refreshWords} wordsLoading={wordsLoading} />}
       {page === "words" && <WordsPage />}
-      {page === "stats" && <div className="py-20 text-gray-400 text-sm">统计面板开发中…</div>}
+      {page === "stats" && <StatsPage />}
       {page === "settings" && <div className="py-20 text-gray-400 text-sm">设置页面开发中…</div>}
     </main>
   );
