@@ -114,19 +114,19 @@ export default function Flashcard({ wordData, direction }: FlashcardProps) {
                 背面 — 中文释义 / 罗马音 / 例句
                ════════════════════════════════════════ */}
             <div
-              className="absolute inset-0 rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-center gap-5 p-8"
+              className="absolute inset-0 rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-center gap-5 p-8
+                         bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-800 dark:to-slate-900"
               style={{
                 backfaceVisibility: "hidden",
                 transform: "rotateY(180deg)",
-                background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
               }}
             >
               {/* 含义 */}
               <div>
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                   释义
                 </span>
-                <p className="mt-1 text-2xl font-bold text-slate-800 leading-relaxed">
+                <p className="mt-1 text-2xl font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
                   {wordData.meaning}
                 </p>
               </div>
@@ -134,17 +134,17 @@ export default function Flashcard({ wordData, direction }: FlashcardProps) {
               {/* 罗马音 */}
               {wordData.romaji && (
                 <div>
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                  <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                     ローマ字
                   </span>
-                  <p className="mt-1 text-lg text-slate-600 italic tracking-wide">
+                  <p className="mt-1 text-lg text-slate-600 dark:text-slate-300 italic tracking-wide">
                     {wordData.romaji}
                   </p>
                 </div>
               )}
 
               {/* 分隔线 */}
-              <hr className="border-slate-300" />
+              <hr className="border-slate-300 dark:border-slate-600" />
 
               {/* 例句 */}
               {wordData.example_ja && (
@@ -167,16 +167,16 @@ export default function Flashcard({ wordData, direction }: FlashcardProps) {
               <div className="flex justify-center">
                 <button
                   onClick={handleSpeak}
-                  className="p-2.5 rounded-full bg-slate-200 hover:bg-slate-300
+                  className="p-2.5 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600
                              transition-colors duration-200 active:scale-90"
                   aria-label="朗读"
                 >
-                  <Volume2 size={20} className="text-slate-600" />
+                  <Volume2 size={20} className="text-slate-600 dark:text-slate-300" />
                 </button>
               </div>
 
               {/* 底部提示 */}
-              <span className="absolute bottom-6 text-xs text-slate-400 tracking-wide self-center">
+              <span className="absolute bottom-6 text-xs text-slate-400 dark:text-slate-500 tracking-wide self-center">
                 点击卡片翻转回日文
               </span>
             </div>

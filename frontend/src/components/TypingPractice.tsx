@@ -66,12 +66,12 @@ export default function TypingPractice({ wordData, onCorrect }: TypingPracticePr
       ? "border-emerald-400"
       : feedback === "failure"
         ? "border-red-400"
-        : "border-gray-600 focus-within:border-indigo-400";
+        : "border-gray-300 dark:border-gray-600 focus-within:border-indigo-400";
 
   return (
     <div className="w-full max-w-md">
       {/* 提示词 */}
-      <p className="text-sm text-gray-400 mb-2 text-center">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 text-center">
         请输入「{wordData.meaning}」的假名或罗马音
       </p>
 
@@ -89,7 +89,7 @@ export default function TypingPractice({ wordData, onCorrect }: TypingPracticePr
             ? { duration: 0.4, ease: "easeInOut" }
             : { duration: 0.3, ease: "easeOut" }
         }
-        className={`relative rounded-xl border-2 ${borderColor} bg-gray-900 transition-colors duration-300`}
+        className={`relative rounded-xl border-2 ${borderColor} bg-gray-50 dark:bg-gray-900 transition-colors duration-300`}
       >
         <input
           ref={inputRef}
@@ -104,8 +104,8 @@ export default function TypingPractice({ wordData, onCorrect }: TypingPracticePr
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          className="w-full bg-transparent px-4 py-3 text-lg text-gray-100 placeholder-gray-600
-                     outline-none font-mono tracking-wide"
+          className="w-full bg-transparent px-4 py-3 text-base sm:text-lg text-gray-900 dark:text-gray-100
+                     placeholder-gray-400 dark:placeholder-gray-600 outline-none font-mono tracking-wide"
         />
       </motion.div>
 
