@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Volume2, Lightbulb } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Volume2 } from "lucide-react";
 import api from "../api/axios";
 import { playJapaneseSpeech } from "../utils/tts";
 
