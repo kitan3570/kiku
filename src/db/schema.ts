@@ -29,6 +29,25 @@ export const users = pgTable(
 );
 
 // ═══════════════════════════════════════════════════════
+// user_settings — 用户设置（提醒时间、每日目标等）
+// ═══════════════════════════════════════════════════════
+export const userSettings = pgTable(
+  "user_settings",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" })
+      .unique(),
+    // 每日提醒时间（0-23 小时，默认 20）
+    reminderHour: integer("reminder_hour").notNull().default(20),
+    // 每日复习目标数量（0 = 全部）
+    dailyGoal: integer("daily_goal").notNull().default(20),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  }
+);
+
+// ═══════════════════════════════════════════════════════
 // words — 日语单词词库（全局共享）
 // ═══════════════════════════════════════════════════════
 export const words = pgTable(

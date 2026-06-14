@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.js";
 import wordRoutes from "./routes/word.js";
 import reviewRoutes from "./routes/review.js";
 import statsRoutes from "./routes/stats.js";
+import settingsRoutes from "./routes/settings.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -54,6 +55,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/words", wordRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // ═══════════════════════════════════════════════════════
 // 启动服务器
