@@ -113,7 +113,7 @@ function TabBar({ page, onChange }: { page: Page; onChange: (p: Page) => void })
 // ═══════════════════════════════════════════════════════
 // Review Page
 // ═══════════════════════════════════════════════════════
-function ReviewPage({ words, index, direction, goPrev, goNext, submitReview, refreshWords, wordsLoading }: any) {
+function ReviewPage({ words, index, direction, goPrev, goNext, submitReview, refreshWords }: any) {
   if (words.length === 0) return (
     <div className="flex flex-col items-center gap-4 mt-16 text-gray-400 dark:text-gray-500">
       <p className="text-lg">🎉 今日复习已完成！</p>
@@ -230,7 +230,7 @@ export default function App() {
 
       {page === "review" && !localStorage.getItem("kiku-onboarding") && <Onboarding />}
 
-      {page === "review" && <ReviewPage words={words} index={index} direction={direction} goPrev={goPrev} goNext={goNext} submitReview={submitReview} refreshWords={refreshWords} wordsLoading={wordsLoading} />}
+      {page === "review" && <ReviewPage words={words} index={index} direction={direction} goPrev={goPrev} goNext={goNext} submitReview={submitReview} refreshWords={refreshWords} />}
       {page === "words" && <WordsPage />}
       {page === "stats" && <StatsPage />}
       {page === "settings" && <SettingsPage />}

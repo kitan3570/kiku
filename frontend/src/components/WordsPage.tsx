@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Trash2, Download, Plus, Filter, X } from "lucide-react";
+import { BookOpen, Trash2, Download, Plus, X } from "lucide-react";
 import api from "../api/axios";
 
 interface WordItem {
