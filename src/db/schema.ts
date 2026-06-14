@@ -60,6 +60,32 @@ export const words = pgTable(
 );
 
 // ═══════════════════════════════════════════════════════
+// refresh_tokens — 多端登录 Refresh Token 持久化
+// ═══════════════════════════════════════════════════════
+export const refreshTokens = pgTable(
+  "refresh_tokens",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // SHA-256 hash of the raw refresh token
+    tokenHash: varchar("token_hash", { length: 64 }).notNull().unique(),
+    // 设备标识（"web" / "ios" / "android"），用于多端管理
+    deviceInfo: varchar("device_info", { length: 128 }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_rt_user_id").on(table.userId),
+    index("idx_rt_token_hash").on(table.tokenHash),
+    index("idx_rt_expires").on(table.expiresAt),
+  ]
+);
+
+// ═══════════════════════════════════════════════════════
 // progress — 用户学习进度（FSRS / 艾宾浩斯记忆算法）
 // ═══════════════════════════════════════════════════════
 export const progress = pgTable(
