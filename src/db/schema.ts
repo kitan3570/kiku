@@ -48,6 +48,19 @@ export const userSettings = pgTable(
 );
 
 // ═══════════════════════════════════════════════════════
+// word_cache — Jisho API 查询缓存（24h 有效）
+// ═══════════════════════════════════════════════════════
+export const wordCache = pgTable(
+  "word_cache",
+  {
+    id: serial("id").primaryKey(),
+    query: varchar("query", { length: 128 }).notNull().unique(),
+    data: text("data").notNull(), // JSON string
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  }
+);
+
+// ═══════════════════════════════════════════════════════
 // words — 日语单词词库（全局共享）
 // ═══════════════════════════════════════════════════════
 export const words = pgTable(

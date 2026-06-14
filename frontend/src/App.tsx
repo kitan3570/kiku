@@ -5,6 +5,7 @@ import WordsPage from "./components/WordsPage";
 import StatsPage from "./components/StatsPage";
 import SettingsPage from "./components/SettingsPage";
 import Onboarding from "./components/Onboarding";
+import SearchBar from "./components/SearchBar";
 import { useAuth } from "./context/AuthContext";
 import { useTheme } from "./context/ThemeContext";
 import {
@@ -219,6 +220,7 @@ export default function App() {
           <h1 className="text-lg sm:text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">聞く Kiku</h1>
           <span className="text-xs text-gray-400 hidden sm:inline">Hi, {user?.username}</span>
         </div>
+        <SearchBar />
         <div className="flex items-center gap-0.5">
           <ThemeToggle />
           <button onClick={refreshWords} disabled={wordsLoading} className="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><RefreshCw size={16} className={wordsLoading ? "animate-spin" : ""} /></button>

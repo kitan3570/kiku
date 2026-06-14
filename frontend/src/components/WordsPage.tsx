@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Trash2, Download, Plus, X } from "lucide-react";
+import { BookOpen, Trash2, Download, Plus, X, Sparkles, Search } from "lucide-react";
 import api from "../api/axios";
 
 interface WordItem {
@@ -82,6 +82,9 @@ export default function WordsPage() {
       </div>
       {presetMsg && <p className="text-xs text-emerald-600 dark:text-emerald-400">{presetMsg}</p>}
 
+      {/* Jisho 智能导入 */}
+      <SmartImport onImported={fetchWords} />
+
       {/* 标签筛选 */}
       {allTags.length > 0 && (
         <div className="flex gap-1.5 flex-wrap">
@@ -152,6 +155,69 @@ export default function WordsPage() {
                 className="p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all">
                 <Trash2 size={15} />
               </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// SmartImport — Jisho API 智能单词查询 + 一键导入
+// ═══════════════════════════════════════════════════════
+function SmartImport({ onImported }: { onImported: () => void }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const lookup = async () => {
+    if (!query.trim()) return;
+    setLoading(true); setResults([]); setMsg("");
+    try {
+      const { data } = await api.get(`/words/lookup?q=${encodeURIComponent(query.trim())}`);
+      if (data.found) { setResults(data.results); } else { setMsg("未找到匹配的单词"); }
+    } catch { setMsg("查询失败，请重试"); }
+    finally { setLoading(false); }
+  };
+
+  const save = async (item: any) => {
+    try {
+      await api.post("/words/import", { words: [{ word: item.word, kana: item.kana, romaji: "", meaning: item.meaning, tags: item.pos, example_ja: item.example || "", example_zh: item.exampleZh || "" }] });
+      setMsg(`✅ 已保存「${item.word}」`);
+      onImported();
+    } catch { setMsg("保存失败"); }
+  };
+
+  return (
+    <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/50">
+      <div className="flex items-center gap-2 mb-2">
+        <Sparkles size={16} className="text-indigo-500" />
+        <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">智能导入</span>
+      </div>
+      <div className="flex gap-2">
+        <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && lookup()}
+          placeholder="输入日语单词，自动查询…" className="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:border-indigo-400 min-h-[44px]" />
+        <button onClick={lookup} disabled={loading}
+          className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500 disabled:opacity-50 transition-colors min-h-[44px] flex items-center gap-1">
+          <Search size={14} /> {loading ? "查询中" : "查询"}
+        </button>
+      </div>
+      {msg && <p className="text-xs mt-2 text-gray-500">{msg}</p>}
+      {results.length > 0 && (
+        <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
+          {results.map((r, i) => (
+            <div key={i} className="p-3 rounded-xl bg-white dark:bg-gray-800/70 border border-gray-100 dark:border-gray-700 flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-gray-900 dark:text-gray-100">{r.word}</span>
+                  <span className="text-sm text-gray-500">{r.kana}</span>
+                  {r.pos && <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500">{r.pos}</span>}
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{r.meaning}</p>
+              </div>
+              <button onClick={() => save(r)} className="shrink-0 px-3 py-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-medium hover:bg-indigo-200 transition-colors">保存</button>
             </div>
           ))}
         </div>
