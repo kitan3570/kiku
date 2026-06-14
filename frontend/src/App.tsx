@@ -4,6 +4,7 @@ import TypingPractice from "./components/TypingPractice";
 import WordsPage from "./components/WordsPage";
 import StatsPage from "./components/StatsPage";
 import SettingsPage from "./components/SettingsPage";
+import Onboarding from "./components/Onboarding";
 import { useAuth } from "./context/AuthContext";
 import { useTheme } from "./context/ThemeContext";
 import {
@@ -222,6 +223,8 @@ export default function App() {
       </div>
 
       <TabBar page={page} onChange={setPage} />
+
+      {page === "review" && !localStorage.getItem("kiku-onboarding") && <Onboarding />}
 
       {page === "review" && <ReviewPage words={words} index={index} direction={direction} goPrev={goPrev} goNext={goNext} submitReview={submitReview} refreshWords={refreshWords} wordsLoading={wordsLoading} />}
       {page === "words" && <WordsPage />}
