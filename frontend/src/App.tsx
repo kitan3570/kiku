@@ -134,12 +134,35 @@ function ReviewPage({ words, index, direction, goPrev, goNext, submitReview, ref
         <button onClick={goNext} disabled={index === words.length - 1} className={`${btn} bg-indigo-600 text-white hover:bg-indigo-500`}>下一个<ChevronRight size={18} /></button>
       </div>
       <div className="w-full max-w-md space-y-3">
-        <TypingPractice wordData={toWordData(current)} onCorrect={() => submitReview(current.wordId, 5)} />
-        <div className="flex items-center justify-center gap-2"><span className="text-xs text-gray-400 mr-1">评分:</span>
-          {[0,1,2,3,4,5].map(r => <button key={r} onClick={() => submitReview(current.wordId, r)} className="w-8 h-8 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-indigo-600 hover:text-white transition-all active:scale-90" title={["不会","眼熟","认识","熟悉","掌握","精通"][r]}>{r}</button>)}
+        <TypingPractice
+          wordData={toWordData(current)}
+          familiarity={current.familiarity}
+          onCorrect={() => submitReview(current.wordId, true)}
+          onIncorrect={() => submitReview(current.wordId, false)}
+        />
+        {/* 熟悉度指示器 */}
+        <div className="flex items-center justify-center gap-2">
+          <span className="text-xs text-gray-400">熟练度:</span>
+          {[0, 1, 2, 3, 4, 5].map(r => (
+            <span key={r} className={`w-2.5 h-2.5 rounded-full transition-all ${
+              r <= current.familiarity ? "bg-indigo-500" : "bg-gray-200 dark:bg-gray-700"
+            }`} />
+          ))}
+          <span className="text-xs text-gray-400 ml-1">
+            {["新词", "眼熟", "认识", "熟悉", "掌握", "精通"][current.familiarity] ?? "新词"}
+            {current.streakCorrect > 0 && ` · ${current.streakCorrect}/3`}
+          </span>
+        </div>
+        {/* 手动干预按钮 */}
+        <div className="flex items-center justify-center gap-2">
+          <span className="text-xs text-gray-400 mr-1">手动:</span>
+          <button onClick={() => submitReview(current.wordId, true)}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 transition-colors">✓ 正确</button>
+          <button onClick={() => submitReview(current.wordId, false)}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 transition-colors">✗ 错误</button>
         </div>
       </div>
-      <p className="text-xs text-gray-400 dark:text-gray-600">点击卡片翻转 · 喇叭听发音 · 评分自动刷新</p>
+      <p className="text-xs text-gray-400 dark:text-gray-600">点击卡片翻转 · 喇叭听发音 · 连续正确 3 次自动升级</p>
     </>
   );
 }

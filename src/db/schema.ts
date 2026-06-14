@@ -147,9 +147,11 @@ export const progress = pgTable(
     // 连续正确次数
     lapses: integer("lapses").notNull().default(0),
 
-    // — 用户友好级别（可映射自 stability / difficulty）—
-    // 0=完全不会, 1=眼熟, 2=认识, 3=熟悉, 4=掌握, 5=精通
+    // — 用户友好级别（自动追踪，不再手动评分）—
+    // 0=新词, 1=眼熟, 2=认识, 3=熟悉, 4=掌握, 5=精通
     familiarity: integer("familiarity").notNull().default(0),
+    // 连续正确次数（用于自动升级/降级）
+    streakCorrect: integer("streak_correct").notNull().default(0),
 
     // — 时间追踪 —
     lastReview: timestamp("last_review", { withTimezone: true }),

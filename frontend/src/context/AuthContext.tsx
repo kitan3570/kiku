@@ -32,6 +32,7 @@ export interface ReviewWord {
   difficulty: number;
   repetitions: number;
   lapses: number;
+  streakCorrect: number;
   lastReview: string | null;
   nextReview: string;
 }
@@ -46,7 +47,7 @@ interface AuthState {
   register: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshWords: () => Promise<void>;
-  submitReview: (wordId: number, rating: number) => Promise<void>;
+  submitReview: (wordId: number, isCorrect: boolean) => Promise<void>;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -135,10 +136,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await refreshWordsInternal();
   }, [refreshWordsInternal]);
 
-  // ── 提交复习评分 ────────────────────────────────
-  const submitReview = useCallback(async (wordId: number, rating: number) => {
-    await api.post("/review/submit", { wordId, rating });
-    // 提交后从列表中移除该词
+  // ── 提交复习（智能算法，传 isCorrect 而非 rating）──
+  const submitReview = useCallback(async (wordId: number, isCorrect: boolean) => {
+    await api.post("/review/submit", { wordId, isCorrect });
     setWords((prev) => prev.filter((w) => w.wordId !== wordId));
   }, []);
 
