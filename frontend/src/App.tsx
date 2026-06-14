@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import Flashcard, { type WordData } from "./components/Flashcard";
 import TypingPractice from "./components/TypingPractice";
 import WordsPage from "./components/WordsPage";
@@ -197,43 +198,52 @@ export default function App() {
   const goPrev = useCallback(() => { if (index > 0) { setDirection(-1); setIndex(i => i - 1); } }, [index]);
 
   if (isLoading) return (
-    <main className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
-      <div className="flex flex-col items-center gap-4"><div className="w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" /><p className="text-gray-400 text-sm">加载中…</p></div>
-    </main>
+    <>
+      <main className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+        <div className="flex flex-col items-center gap-4"><div className="w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" /><p className="text-gray-400 text-sm">加载中…</p></div>
+      </main>
+      <Analytics />
+    </>
   );
 
   if (!isAuthenticated) return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-8 px-4 bg-white dark:bg-gray-950">
-      <h1 className="text-3xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">聞く Kiku</h1>
-      <p className="text-gray-400 dark:text-gray-500 text-sm">登录后开始日语单词复习</p>
-      <AuthForm onLogin={login} onRegister={register} />
-      <div className="absolute top-4 right-4"><ThemeToggle /></div>
-    </main>
+    <>
+      <main className="min-h-screen flex flex-col items-center justify-center gap-8 px-4 bg-white dark:bg-gray-950">
+        <h1 className="text-3xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">聞く Kiku</h1>
+        <p className="text-gray-400 dark:text-gray-500 text-sm">登录后开始日语单词复习</p>
+        <AuthForm onLogin={login} onRegister={register} />
+        <div className="absolute top-4 right-4"><ThemeToggle /></div>
+      </main>
+      <Analytics />
+    </>
   );
 
   return (
-    <main className="min-h-screen flex flex-col items-center gap-4 px-4 py-4 sm:py-6 bg-white dark:bg-gray-950">
-      {/* Top bar */}
-      <div className="w-full max-w-md flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg sm:text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">聞く Kiku</h1>
-          <span className="text-xs text-gray-400 hidden sm:inline">Hi, {user?.username}</span>
+    <>
+      <main className="min-h-screen flex flex-col items-center gap-4 px-4 py-4 sm:py-6 bg-white dark:bg-gray-950">
+        {/* Top bar */}
+        <div className="w-full max-w-md flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg sm:text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">聞く Kiku</h1>
+            <span className="text-xs text-gray-400 hidden sm:inline">Hi, {user?.username}</span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <ThemeToggle />
+            <button onClick={refreshWords} disabled={wordsLoading} className="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><RefreshCw size={16} className={wordsLoading ? "animate-spin" : ""} /></button>
+            <button onClick={logout} className="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><LogOut size={16} /></button>
+          </div>
         </div>
-        <div className="flex items-center gap-0.5">
-          <ThemeToggle />
-          <button onClick={refreshWords} disabled={wordsLoading} className="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><RefreshCw size={16} className={wordsLoading ? "animate-spin" : ""} /></button>
-          <button onClick={logout} className="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><LogOut size={16} /></button>
-        </div>
-      </div>
 
-      <TabBar page={page} onChange={setPage} />
+        <TabBar page={page} onChange={setPage} />
 
-      {page === "review" && !localStorage.getItem("kiku-onboarding") && <Onboarding />}
+        {page === "review" && !localStorage.getItem("kiku-onboarding") && <Onboarding />}
 
-      {page === "review" && <ReviewPage words={words} index={index} direction={direction} goPrev={goPrev} goNext={goNext} submitReview={submitReview} refreshWords={refreshWords} wordsLoading={wordsLoading} />}
-      {page === "words" && <WordsPage />}
-      {page === "stats" && <StatsPage />}
-      {page === "settings" && <SettingsPage />}
-    </main>
+        {page === "review" && <ReviewPage words={words} index={index} direction={direction} goPrev={goPrev} goNext={goNext} submitReview={submitReview} refreshWords={refreshWords} wordsLoading={wordsLoading} />}
+        {page === "words" && <WordsPage />}
+        {page === "stats" && <StatsPage />}
+        {page === "settings" && <SettingsPage />}
+      </main>
+      <Analytics />
+    </>
   );
 }
