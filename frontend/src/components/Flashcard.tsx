@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { Volume2 } from "lucide-react";
+import { playJapaneseSpeech } from "../utils/tts";
 
 // ── 类型定义 ──────────────────────────────────────────
 export interface WordData {
@@ -43,9 +45,12 @@ const slideVariants: Variants = {
 export default function Flashcard({ wordData, direction }: FlashcardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  // 切换单词时重置翻转状态
-  // 使用 key effect 重置
   const handleCardClick = () => setIsFlipped((prev) => !prev);
+
+  const handleSpeak = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 防止触发酵片翻转
+    playJapaneseSpeech(wordData.word);
+  };
 
   return (
     <div className="flex justify-center items-center w-full">
@@ -89,9 +94,19 @@ export default function Flashcard({ wordData, direction }: FlashcardProps) {
                 {wordData.kana}
               </span>
 
+              {/* 喇叭按钮 — 朗读当前单词 */}
+              <button
+                onClick={handleSpeak}
+                className="relative mt-2 p-3 rounded-full bg-white/15 hover:bg-white/25
+                           transition-colors duration-200 active:scale-90"
+                aria-label="朗读"
+              >
+                <Volume2 size={22} className="text-white/80" />
+              </button>
+
               {/* 底部提示 */}
               <span className="absolute bottom-6 text-xs text-white/40 tracking-wide">
-                点击翻转查看释义
+                点击卡片翻转查看释义
               </span>
             </div>
 
@@ -148,9 +163,21 @@ export default function Flashcard({ wordData, direction }: FlashcardProps) {
                 </div>
               )}
 
+              {/* 喇叭按钮 — 朗读当前单词 */}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleSpeak}
+                  className="p-2.5 rounded-full bg-slate-200 hover:bg-slate-300
+                             transition-colors duration-200 active:scale-90"
+                  aria-label="朗读"
+                >
+                  <Volume2 size={20} className="text-slate-600" />
+                </button>
+              </div>
+
               {/* 底部提示 */}
               <span className="absolute bottom-6 text-xs text-slate-400 tracking-wide self-center">
-                点击翻转回日文
+                点击卡片翻转回日文
               </span>
             </div>
           </motion.div>

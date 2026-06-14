@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import Flashcard, { type WordData } from "./components/Flashcard";
+import TypingPractice from "./components/TypingPractice";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // ── Mock 单词数据 ─────────────────────────────────────
@@ -75,7 +76,7 @@ export default function App() {
       <Flashcard wordData={current} direction={direction} />
 
       {/* 导航按钮 */}
-      <div className="flex items-center gap-6 mt-2">
+      <div className="flex items-center gap-6">
         <button
           onClick={goPrev}
           disabled={index === 0}
@@ -105,9 +106,12 @@ export default function App() {
         </button>
       </div>
 
+      {/* 拼写练习 */}
+      <TypingPractice wordData={current} />
+
       {/* 操作提示 */}
-      <p className="text-xs text-gray-600 mt-2">
-        点击卡片翻转查看释义 · 使用按钮切换单词
+      <p className="text-xs text-gray-600">
+        点击卡片翻转查看释义 · 点击喇叭图标听发音
       </p>
     </main>
   );
