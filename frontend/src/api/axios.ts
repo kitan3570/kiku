@@ -3,8 +3,10 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 // ═══════════════════════════════════════════════════════
 // Axios 实例
 // ═══════════════════════════════════════════════════════
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: API_BASE,
   timeout: 15000,
   headers: { "Content-Type": "application/json" },
 });
@@ -79,7 +81,7 @@ api.interceptors.response.use(
 
     try {
       // 调用刷新接口（refresh_token 由 HttpOnly Cookie 自动携带）
-      const { data } = await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+      const { data } = await axios.post(`${API_BASE}/auth/refresh`, {}, { withCredentials: true });
 
       const newToken: string = data.accessToken;
       localStorage.setItem("access_token", newToken);

@@ -90,9 +90,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const API_BASE = import.meta.env.VITE_API_URL || "/api";
+
   // ── 登录 ────────────────────────────────────────
   const login = useCallback(async (username: string, password: string) => {
-    const { data } = await axios.post("/api/auth/login", { username, password }, { withCredentials: true });
+    const { data } = await axios.post(`${API_BASE}/auth/login`, { username, password }, { withCredentials: true });
     localStorage.setItem("access_token", data.accessToken);
     setUser(data.user);
     // 登录后自动拉取今日复习
