@@ -1,11 +1,14 @@
 import { useState, useCallback, useEffect } from "react";
 import Flashcard, { type WordData } from "./components/Flashcard";
 import TypingPractice from "./components/TypingPractice";
+import api from "./api/axios";
 import WordsPage from "./components/WordsPage";
 import StatsPage from "./components/StatsPage";
 import SettingsPage from "./components/SettingsPage";
 import Onboarding from "./components/Onboarding";
 import SearchBar from "./components/SearchBar";
+import QuizExercise from "./components/QuizExercise";
+import DictationExercise from "./components/DictationExercise";
 import { useAuth } from "./context/AuthContext";
 import { useTheme } from "./context/ThemeContext";
 import {
@@ -115,60 +118,106 @@ function TabBar({ page, onChange }: { page: Page; onChange: (p: Page) => void })
 // Review Page
 // ═══════════════════════════════════════════════════════
 function ReviewPage({ words, index, direction, goPrev, goNext, submitReview, refreshWords }: any) {
-  if (words.length === 0) return (
+  const [mode, setMode] = useState<"typing" | "dictation" | "quiz">("typing");
+  const [newWords, setNewWords] = useState<any[]>([]);
+  const [newIndex, setNewIndex] = useState(0);
+  const [showingNew, setShowingNew] = useState(false);
+
+  const fetchNewWords = async () => {
+    try { const { data } = await api.get("/review/new-words?limit=20"); setNewWords(data.words || []); setNewIndex(0); setShowingNew(true); }
+    catch { setNewWords([]); }
+  };
+
+  // 处理结果
+  const handleResult = (wordId: number, isCorrect: boolean) => {
+    submitReview(wordId, isCorrect);
+    if (showingNew) setNewIndex(i => i + 1);
+  };
+
+  if (showingNew && newWords.length > 0 && newIndex >= newWords.length) {
+    return <div className="flex flex-col items-center gap-4 mt-16 text-gray-400 dark:text-gray-500">
+      <p className="text-lg">🎉 本轮新词已完成！</p>
+      <button onClick={() => setShowingNew(false)} className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm">返回复习</button>
+    </div>;
+  }
+
+  if (words.length === 0 && !showingNew) return (
     <div className="flex flex-col items-center gap-4 mt-16 text-gray-400 dark:text-gray-500">
       <p className="text-lg">🎉 今日复习已完成！</p>
-      <p className="text-sm">暂时没有需要复习的单词。</p>
-      <button onClick={refreshWords} className="mt-2 px-4 py-2 min-h-[44px] rounded-xl bg-gray-100 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">刷新检查</button>
+      <div className="flex gap-2">
+        <button onClick={refreshWords} className="px-4 py-2 min-h-[44px] rounded-xl bg-gray-100 dark:bg-gray-800 text-sm">刷新检查</button>
+        <button onClick={fetchNewWords} className="px-4 py-2 min-h-[44px] rounded-xl bg-indigo-600 text-white text-sm">学习新词</button>
+      </div>
     </div>
   );
 
-  const current = words[index];
+  const current = showingNew && newWords.length > 0 ? newWords[newIndex] : words[index];
+  if (!current) return <p className="text-gray-400 text-center mt-16">加载中…</p>;
   const btn = "flex items-center gap-1 px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 active:scale-95";
 
   return (
     <>
-      <div className="flex items-center gap-2 text-sm">
-        {words.map((_: any, i: number) => (
-          <span key={i} className={`w-2 h-2 rounded-full transition-colors ${i === index ? "bg-indigo-400 scale-125" : "bg-gray-200 dark:bg-gray-700"}`} />
+      {/* 模式选择器 */}
+      <div className="flex items-center gap-1 p-0.5 rounded-xl bg-gray-100 dark:bg-gray-800">
+        {(["typing", "dictation", "quiz"] as const).map(m => (
+          <button key={m} onClick={() => { setMode(m); setShowingNew(false); }}
+            className={`px-3 py-1.5 rounded-[10px] text-xs font-medium transition-all ${
+              mode === m ? "bg-white dark:bg-gray-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-gray-500"}`}>
+            {m === "typing" ? "⌨️ 打字" : m === "dictation" ? "🎧 听写" : "📝 四选一"}
+          </button>
         ))}
       </div>
-      <Flashcard wordData={toWordData(current)} direction={direction} />
-      <div className="flex items-center gap-4 sm:gap-6">
-        <button onClick={goPrev} disabled={index === 0} className={`${btn} bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700`}><ChevronLeft size={18} />上一个</button>
-        <span className="text-sm text-gray-400 tabular-nums min-w-[4ch] text-center">{index + 1} / {words.length}</span>
-        <button onClick={goNext} disabled={index === words.length - 1} className={`${btn} bg-indigo-600 text-white hover:bg-indigo-500`}>下一个<ChevronRight size={18} /></button>
-      </div>
-      <div className="w-full max-w-md space-y-3">
-        <TypingPractice
-          wordData={toWordData(current)}
-          familiarity={current.familiarity}
-          onCorrect={() => submitReview(current.wordId, true)}
-          onIncorrect={() => submitReview(current.wordId, false)}
-        />
-        {/* 熟悉度指示器 */}
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-xs text-gray-400">熟练度:</span>
-          {[0, 1, 2, 3, 4, 5].map(r => (
-            <span key={r} className={`w-2.5 h-2.5 rounded-full transition-all ${
-              r <= current.familiarity ? "bg-indigo-500" : "bg-gray-200 dark:bg-gray-700"
-            }`} />
-          ))}
-          <span className="text-xs text-gray-400 ml-1">
-            {["新词", "眼熟", "认识", "熟悉", "掌握", "精通"][current.familiarity] ?? "新词"}
-            {current.streakCorrect > 0 && ` · ${current.streakCorrect}/3`}
-          </span>
-        </div>
-        {/* 手动干预按钮 */}
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-xs text-gray-400 mr-1">手动:</span>
-          <button onClick={() => submitReview(current.wordId, true)}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 transition-colors">✓ 正确</button>
-          <button onClick={() => submitReview(current.wordId, false)}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 transition-colors">✗ 错误</button>
-        </div>
-      </div>
-      <p className="text-xs text-gray-400 dark:text-gray-600">点击卡片翻转 · 喇叭听发音 · 连续正确 3 次自动升级</p>
+
+      {/* 新词按钮 */}
+      {!showingNew && words.length > 0 && (
+        <button onClick={fetchNewWords} className="text-xs text-indigo-500 hover:underline">📖 学习新词</button>
+      )}
+
+      {mode === "quiz" ? (
+        <QuizExercise onResult={handleResult} />
+      ) : mode === "dictation" ? (
+        <DictationExercise word={current} onResult={handleResult} />
+      ) : (
+        <>
+          <div className="flex items-center gap-2 text-sm">
+            {(showingNew ? newWords : words).map((_: any, i: number) => (
+              <span key={i} className={`w-2 h-2 rounded-full transition-colors ${
+                i === (showingNew ? newIndex : index) ? "bg-indigo-400 scale-125" : "bg-gray-200 dark:bg-gray-700"}`} />
+            ))}
+          </div>
+          <Flashcard wordData={toWordData(current)} direction={direction} />
+          <div className="flex items-center gap-4 sm:gap-6">
+            <button onClick={goPrev} disabled={(showingNew ? newIndex : index) === 0}
+              className={`${btn} bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700`}>
+              <ChevronLeft size={18} />上一个</button>
+            <span className="text-sm text-gray-400 tabular-nums text-center">
+              {(showingNew ? newIndex : index) + 1} / {(showingNew ? newWords : words).length}</span>
+            <button onClick={goNext} disabled={(showingNew ? newIndex : index) >= (showingNew ? newWords : words).length - 1}
+              className={`${btn} bg-indigo-600 text-white hover:bg-indigo-500`}>下一个<ChevronRight size={18} /></button>
+          </div>
+          <div className="w-full max-w-md space-y-3">
+            <TypingPractice wordData={toWordData(current)} familiarity={current.familiarity ?? 0}
+              onCorrect={() => handleResult(current.wordId, true)}
+              onIncorrect={() => handleResult(current.wordId, false)} />
+            {current.familiarity !== undefined && (<>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xs text-gray-400">熟练度:</span>
+                {[0,1,2,3,4,5].map(r => <span key={r} className={`w-2.5 h-2.5 rounded-full ${r <= (current.familiarity??0) ? "bg-indigo-500" : "bg-gray-200 dark:bg-gray-700"}`} />)}
+                <span className="text-xs text-gray-400 ml-1">{["新词","眼熟","认识","熟悉","掌握","精通"][current.familiarity??0]}{current.streakCorrect > 0 && ` · ${current.streakCorrect}/3`}</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xs text-gray-400 mr-1">手动:</span>
+                <button onClick={() => handleResult(current.wordId, true)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 transition-colors">✓ 正确</button>
+                <button onClick={() => handleResult(current.wordId, false)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 transition-colors">✗ 错误</button>
+              </div>
+            </>)}
+          </div>
+          <p className="text-xs text-gray-400 dark:text-gray-600">点击卡片翻转 · 连续正确3次自动升级</p>
+        </>
+      )}
+      {showingNew && <p className="text-xs text-indigo-400">📖 正在学习新词 #{newIndex + 1}/{newWords.length}</p>}
     </>
   );
 }
