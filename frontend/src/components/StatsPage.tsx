@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
 import api from "../api/axios";
+import Heatmap from "./Heatmap";
 
 const COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#8b5cf6"];
 const LEVEL_LABELS = ["不会", "眼熟", "认识", "熟悉", "掌握", "精通"];
@@ -62,6 +63,8 @@ export default function StatsPage() {
           </div>
         ))}
       </div>
+
+      <Heatmap />
 
       <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/50 p-4">
         <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-3">准确率趋势 (近14天)</h3>

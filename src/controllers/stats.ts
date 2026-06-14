@@ -68,3 +68,47 @@ export async function levels(req: Request, res: Response): Promise<void> {
     res.status(500).json({ error: "INTERNAL_ERROR" });
   }
 }
+
+// ═══════════════════════════════════════════════════════
+// GET /api/stats/heatmap — 学习热力图 (近 90 天)
+// ═══════════════════════════════════════════════════════
+export async function heatmap(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.userId;
+    const rows = await db.execute(sql`
+      SELECT created_at::date as date, count(*)::int as count
+      FROM review_logs WHERE user_id = ${userId}
+      AND created_at >= current_date - interval '89 days'
+      GROUP BY date ORDER BY date
+    `);
+    res.json({ data: rows.rows || [] });
+  } catch (err: any) {
+    res.status(500).json({ error: "INTERNAL" });
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// GET /api/stats/streak — 连续打卡天数
+// ═══════════════════════════════════════════════════════
+export async function streak(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.userId;
+    const rows = await db.execute(sql`
+      SELECT created_at::date as date FROM review_logs
+      WHERE user_id = ${userId} AND created_at::date <= current_date
+      GROUP BY date ORDER BY date DESC
+    `);
+    const dates: string[] = (rows.rows || []).map((r: any) => r.date);
+    let count = 0;
+    const today = new Date().toISOString().slice(0, 10);
+    const check = new Date(today);
+    for (const d of dates) {
+      const expected = check.toISOString().slice(0, 10);
+      if (d === expected) { count++; check.setDate(check.getDate() - 1); }
+      else if (d < expected) break;
+    }
+    res.json({ streak: count, totalReviews: dates.length });
+  } catch (err: any) {
+    res.status(500).json({ error: "INTERNAL" });
+  }
+}
