@@ -6,6 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import axios from "axios";
 import api from "../api/axios";
 
 // ═══════════════════════════════════════════════════════
@@ -170,5 +171,3 @@ export function useAuth(): AuthState {
   return ctx;
 }
 
-// 保留 axios 导入用于 login 函数（不走拦截器，需要原生 axios）
-import axios from "axios";
