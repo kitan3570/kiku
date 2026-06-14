@@ -98,8 +98,12 @@ function TabBar({ page, onChange }: { page: Page; onChange: (p: Page) => void })
     <div className="w-full max-w-md flex rounded-xl bg-gray-100 dark:bg-gray-800 p-0.5">
       {TABS.map(([key, label, Icon]) => (
         <button key={key} onClick={() => onChange(key)}
-          className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-[10px] text-xs font-medium transition-colors min-h-[44px] ${page === key ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm" : "text-gray-500 dark:text-gray-400"}`}>
-          <Icon size={14} />{label}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-[10px] text-sm font-semibold transition-all min-h-[48px] active:scale-95 ${
+            page === key 
+              ? "bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+              : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+          }`}>
+          <Icon size={16} />{label}
         </button>
       ))}
     </div>
