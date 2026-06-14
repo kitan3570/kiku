@@ -87,10 +87,10 @@ export default function Flashcard({ wordData, direction }: FlashcardProps) {
               <div className="absolute bottom-10 left-10 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
 
               {/* 文字内容 */}
-              <span className="relative text-5xl font-bold text-white tracking-wider drop-shadow-lg">
+              <span className="relative text-3xl sm:text-5xl font-bold text-white tracking-wider drop-shadow-lg">
                 {wordData.word}
               </span>
-              <span className="relative text-xl text-white/80 tracking-widest">
+              <span className="relative text-lg sm:text-xl text-white/80 tracking-widest">
                 {wordData.kana}
               </span>
 
