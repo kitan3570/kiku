@@ -8,6 +8,7 @@ import wordRoutes, { searchRouter } from "./routes/word.js";
 import reviewRoutes from "./routes/review.js";
 import statsRoutes from "./routes/stats.js";
 import settingsRoutes from "./routes/settings.js";
+import aiRoutes from "./routes/ai.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -57,6 +58,7 @@ app.use("/api/search", searchRouter);
 app.use("/api/review", reviewRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/ai", aiRoutes);
 
 // ═══════════════════════════════════════════════════════
 // 启动服务器

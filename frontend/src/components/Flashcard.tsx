@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Volume2 } from "lucide-react";
+import { Volume2, Brain } from "lucide-react";
 import { playJapaneseSpeech } from "../utils/tts";
+import api from "../api/axios";
 
 // ── 类型定义 ──────────────────────────────────────────
 export interface WordData {
@@ -44,12 +45,25 @@ const slideVariants: Variants = {
 // ── 组件 ──────────────────────────────────────────────
 export default function Flashcard({ wordData, direction }: FlashcardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [mnemonic, setMnemonic] = useState<string | null>(null);
+  const [mnemonicLoading, setMnemonicLoading] = useState(false);
 
   const handleCardClick = () => setIsFlipped((prev) => !prev);
 
   const handleSpeak = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 防止触发酵片翻转
+    e.stopPropagation();
     playJapaneseSpeech(wordData.word);
+  };
+
+  const handleMnemonic = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (mnemonic || mnemonicLoading) return;
+    setMnemonicLoading(true);
+    try {
+      const { data } = await api.post("/ai/mnemonic", { word: wordData.word, kana: wordData.kana, meaning: wordData.meaning });
+      setMnemonic(data.mnemonic);
+    } catch { setMnemonic("AI 暂不可用"); }
+    finally { setMnemonicLoading(false); }
   };
 
   return (
@@ -164,16 +178,23 @@ export default function Flashcard({ wordData, direction }: FlashcardProps) {
               )}
 
               {/* 喇叭按钮 — 朗读当前单词 */}
-              <div className="flex justify-center">
-                <button
-                  onClick={handleSpeak}
-                  className="p-2.5 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600
-                             transition-colors duration-200 active:scale-90"
-                  aria-label="朗读"
-                >
+              <div className="flex justify-center gap-2">
+                <button onClick={handleSpeak}
+                  className="p-2.5 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors duration-200 active:scale-90" aria-label="朗读">
                   <Volume2 size={20} className="text-slate-600 dark:text-slate-300" />
                 </button>
+                <button onClick={handleMnemonic}
+                  className="p-2.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors duration-200 active:scale-90" aria-label="AI助记">
+                  <Brain size={20} className="text-indigo-500" />
+                </button>
               </div>
+
+              {mnemonicLoading && <p className="text-xs text-center text-indigo-400">🧠 AI 正在生成记忆法…</p>}
+              {mnemonic && (
+                <div className="mx-2 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">{mnemonic}</p>
+                </div>
+              )}
 
               {/* 底部提示 */}
               <span className="absolute bottom-6 text-xs text-slate-400 dark:text-slate-500 tracking-wide self-center">
